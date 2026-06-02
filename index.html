@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Jumbo Data Landscape Assistant — Demo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.4.0/dist/tabler-icons.min.css" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --yellow: #FFCB00;
+      --red: #E31837;
+      --dark: #1A1A1A;
+      --bg: #F5F4F0;
+      --surface: #ffffff;
+      --border: rgba(0,0,0,0.1);
+      --border-strong: rgba(0,0,0,0.18);
+      --text: #1A1A1A;
+      --text-muted: #666;
+      --text-faint: #999;
+      --success: #16a34a;
+      --success-bg: #f0fdf4;
+      --warning: #d97706;
+      --warning-bg: #fffbeb;
+      --danger: #dc2626;
+      --danger-bg: #fef2f2;
+      --info: #1d4ed8;
+      --info-bg: #eff6ff;
+      --radius: 10px;
+      --radius-sm: 6px;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 32px 16px 48px;
+      color: var(--text);
+    }
+
+    /* ── Header ── */
+    #page-header {
+      width: 100%;
+      max-width: 760px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+    #page-logo {
+      background: var(--red);
+      color: white;
+      font-size: 24px;
+      font-weight: 600;
+      width: 48px;
+      height: 48px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    #page-title { font-size: 20px; font-weight: 600; color: var(--dark); }
+    #page-sub { font-size: 13px; color: var(--text-muted); margin-top: 2px; }
+    #demo-badge {
+      margin-left: auto;
+      background: var(--red);
+      color: white;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 4px 11px;
+      border-radius: 20px;
+      letter-spacing: 0.5px;
+    }
+
+    /* ── App shell ── */
+    #app {
+      width: 100%;
+      max-width: 760px;
+      background: var(--surface);
+      border-radius: var(--radius);
+      border: 0.5px solid var(--border);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.07);
+    }
+
+    /* ── Top bar ── */
+    #topbar {
+      background: var(--yellow);
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    #tb-icon {
+      background: var(--red);
+      color: white;
+      width: 36px; height: 36px;
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; font-weight: 700;
+      flex-shrink: 0;
+    }
+    #tb-name { font-size: 15px; font-weight: 500; color: var(--dark); }
+    #tb-role { font-size: 11px; color: #444; margin-top: 1px; }
+    #tb-dot { width: 8px; height: 8px; background: #16a34a; border-radius: 50%; margin-left: auto; }
+
+    /* ── Tabs ── */
+    #tabs {
+      display: flex;
+      background: #fafaf8;
+      border-bottom: 0.5px solid var(--border);
+    }
+    .tab {
+      flex: 1;
+      padding: 11px 0;
+      font-size: 12.5px;
+      text-align: center;
+      cursor: pointer;
+      color: var(--text-muted);
+      border-bottom: 2px solid transparent;
+      transition: all .15s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+    }
+    .tab i { font-size: 15px; }
+    .tab.active { color: var(--dark); border-bottom-color: var(--yellow); font-weight: 500; }
+    .tab:hover:not(.active) { background: rgba(0,0,0,0.03); }
+
+    /* ── Chat panel ── */
+    #panel-chat { display: flex; flex-direction: column; height: 520px; }
+    #msgs {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 11px;
+      background: #f9f8f4;
+    }
+    .msg { display: flex; gap: 8px; max-width: 88%; }
+    .msg.user { align-self: flex-end; flex-direction: row-reverse; }
+    .msg.bot  { align-self: flex-start; }
+    .av {
+      width: 30px; height: 30px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 600;
+      flex-shrink: 0; margin-top: 2px;
+    }
+    .bot .av  { background: var(--red); color: white; }
+    .user .av { background: var(--yellow); color: var(--dark); }
+    .bubble {
+      padding: 10px 14px;
+      font-size: 14px;
+      line-height: 1.55;
+    }
+    .msg.bot  .bubble {
+      background: var(--surface);
+      border: 0.5px solid var(--border);
+      border-radius: 4px 14px 14px 14px;
+      color: var(--text);
+    }
+    .msg.user .bubble {
+      background: var(--yellow);
+      border-radius: 14px 4px 14px 14px;
+      color: var(--dark);
+    }
+    .dot-wrap { display: flex; align-items: center; gap: 4px; padding: 10px 14px; }
+    .d { width: 6px; height: 6px; background: #bbb; border-radius: 50%; animation: bop 1.1s infinite; }
+    .d:nth-child(2){animation-delay:.2s} .d:nth-child(3){animation-delay:.4s}
+    @keyframes bop{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-6px)}}
+
+    #chips {
+      padding: 9px 14px;
+      display: flex;
+      gap: 7px;
+      flex-wrap: wrap;
+      background: var(--surface);
+      border-top: 0.5px solid var(--border);
+    }
+    .chip {
+      font-size: 11.5px;
+      padding: 4px 11px;
+      border: 0.5px solid var(--border-strong);
+      border-radius: 20px;
+      cursor: pointer;
+      color: var(--text-muted);
+      background: #f9f8f4;
+      transition: all .15s;
+      white-space: nowrap;
+    }
+    .chip:hover { background: var(--yellow); border-color: var(--yellow); color: var(--dark); }
+
+    #inp-row {
+      padding: 11px 14px;
+      display: flex; gap: 9px;
+      background: var(--surface);
+      border-top: 0.5px solid var(--border);
+    }
+    #inp {
+      flex: 1; padding: 9px 14px;
+      font-size: 14px;
+      border: 0.5px solid var(--border-strong);
+      border-radius: 22px; outline: none;
+      background: #f9f8f4;
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      transition: border .15s, box-shadow .15s;
+    }
+    #inp::placeholder { color: var(--text-faint); }
+    #inp:focus { border-color: var(--yellow); box-shadow: 0 0 0 3px rgba(255,203,0,.18); }
+    #sbtn {
+      width: 38px; height: 38px; border-radius: 50%;
+      background: var(--yellow); border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: all .15s; flex-shrink: 0;
+    }
+    #sbtn:hover { background: #e6b800; }
+    #sbtn:active { transform: scale(.95); }
+    #sbtn i { font-size: 18px; color: var(--dark); }
+
+    /* ── Quality panel ── */
+    #panel-quality, #panel-arch {
+      display: none;
+      flex-direction: column;
+      padding: 18px;
+      gap: 14px;
+      overflow-y: auto;
+      max-height: 520px;
+    }
+    .metric-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 10px; }
+    .metric {
+      background: #f9f8f4;
+      border-radius: var(--radius-sm);
+      padding: 13px 15px;
+    }
+    .metric-label { font-size: 11px; color: var(--text-muted); margin-bottom: 5px; }
+    .metric-val { font-size: 26px; font-weight: 500; }
+    .metric-trend { font-size: 11px; margin-top: 3px; }
+    .ok { color: var(--success); } .warn { color: var(--warning); } .err { color: var(--danger); }
+
+    .section-label { font-size: 13px; font-weight: 500; color: var(--text); }
+
+    .issue {
+      display: flex; align-items: flex-start; gap: 11px;
+      padding: 12px 14px;
+      background: var(--surface);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius-sm);
+    }
+    .issue-ic {
+      width: 30px; height: 30px; border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; font-size: 15px;
+    }
+    .issue-ic.err  { background: var(--danger-bg);  color: var(--danger); }
+    .issue-ic.warn { background: var(--warning-bg); color: var(--warning); }
+    .issue-ic.ok   { background: var(--success-bg); color: var(--success); }
+    .issue-name { font-size: 13.5px; font-weight: 500; color: var(--text); }
+    .issue-desc { font-size: 12.5px; color: var(--text-muted); margin-top: 3px; line-height: 1.45; }
+    .tag {
+      font-size: 10.5px; padding: 2px 8px;
+      border-radius: 10px; font-weight: 500;
+      margin-left: 8px;
+    }
+    .tag-high { background: var(--danger-bg); color: var(--danger); }
+    .tag-med  { background: var(--warning-bg); color: var(--warning); }
+    .tag-low  { background: var(--success-bg); color: var(--success); }
+
+    /* ── Arch panel ── */
+    .arch-card {
+      background: var(--surface);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px 18px;
+    }
+    .arch-head { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .arch-ic { font-size: 20px; color: var(--red); }
+    .arch-title { font-size: 14px; font-weight: 500; }
+    .arch-body { font-size: 13px; color: var(--text-muted); line-height: 1.6; }
+    .pills { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+    .pill {
+      font-size: 11px; padding: 3px 10px;
+      border: 0.5px solid var(--border-strong);
+      border-radius: 12px; color: var(--text-muted);
+    }
+
+    /* ── Footer ── */
+    #footer {
+      width: 100%; max-width: 760px;
+      margin-top: 20px;
+      text-align: center;
+      font-size: 12px;
+      color: var(--text-faint);
+      line-height: 1.6;
+    }
+    #footer a { color: var(--text-muted); text-decoration: none; }
+    #footer a:hover { color: var(--dark); }
+  </style>
+</head>
+<body>
+
+<header id="page-header">
+  <div id="page-logo">J</div>
+  <div>
+    <div id="page-title">Data Landscape Assistant</div>
+    <div id="page-sub">Principal Data Architect · Jumbo Tech Campus</div>
+  </div>
+  <div id="demo-badge">DEMO</div>
+</header>
+
+<div id="app">
+
+  <div id="topbar">
+    <div id="tb-icon">J</div>
+    <div>
+      <div id="tb-name">Jumbo Data Landscape Assistant</div>
+      <div id="tb-role">AI-powered governance & architecture tool</div>
+    </div>
+    <div id="tb-dot"></div>
+  </div>
+
+  <div id="tabs">
+    <div class="tab active" onclick="switchTab('chat',this)">
+      <i class="ti ti-message-circle"></i> AI Assistant
+    </div>
+    <div class="tab" onclick="switchTab('quality',this)">
+      <i class="ti ti-shield-check"></i> Data Quality
+    </div>
+    <div class="tab" onclick="switchTab('arch',this)">
+      <i class="ti ti-topology-star"></i> Architecture
+    </div>
+  </div>
+
+  <!-- CHAT -->
+  <div id="panel-chat">
+    <div id="msgs">
+      <div class="msg bot">
+        <div class="av">J</div>
+        <div class="bubble">Hello! I'm Jumbo's Data Landscape Assistant. I help data teams with governance decisions, quality issues, architectural trade-offs, and planning for Agentic AI readiness.<br><br>What data challenge can I help you with today?</div>
+      </div>
+    </div>
+    <div id="chips">
+      <div class="chip" onclick="sc('Data contract for product catalog')">Data contract for product catalog</div>
+      <div class="chip" onclick="sc('Reduce data duplication')">Reduce data duplication</div>
+      <div class="chip" onclick="sc('Prepare for Agentic AI')">Prepare for Agentic AI</div>
+      <div class="chip" onclick="sc('EBX vs data mesh trade-offs')">EBX vs data mesh</div>
+    </div>
+    <div id="inp-row">
+      <input id="inp" type="text" placeholder="Ask about data governance, architecture, quality..." onkeydown="if(event.key==='Enter')send()" />
+      <button id="sbtn" onclick="send()" aria-label="Send message">
+        <i class="ti ti-send"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- QUALITY -->
+  <div id="panel-quality">
+    <div class="metric-grid">
+      <div class="metric">
+        <div class="metric-label">Overall health</div>
+        <div class="metric-val">87%</div>
+        <div class="metric-trend ok">↑ 3% this month</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">Open issues</div>
+        <div class="metric-val">14</div>
+        <div class="metric-trend warn">3 high priority</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">Data domains</div>
+        <div class="metric-val">9</div>
+        <div class="metric-trend ok">All monitored</div>
+      </div>
+    </div>
+
+    <div class="section-label">Active issues</div>
+
+    <div class="issue">
+      <div class="issue-ic err"><i class="ti ti-alert-triangle"></i></div>
+      <div>
+        <div style="display:flex;align-items:center">
+          <span class="issue-name">Product master duplicates</span>
+          <span class="tag tag-high">High</span>
+        </div>
+        <div class="issue-desc">~2,400 SKUs appear in both EBX and legacy PIM. Creates inconsistency in the pricing engine and downstream analytics.</div>
+      </div>
+    </div>
+
+    <div class="issue">
+      <div class="issue-ic warn"><i class="ti ti-clock"></i></div>
+      <div>
+        <div style="display:flex;align-items:center">
+          <span class="issue-name">Supplier data latency</span>
+          <span class="tag tag-med">Medium</span>
+        </div>
+        <div class="issue-desc">Average 4h delay between supplier updates and warehouse availability. Target is under 30 min.</div>
+      </div>
+    </div>
+
+    <div class="issue">
+      <div class="issue-ic warn"><i class="ti ti-users"></i></div>
+      <div>
+        <div style="display:flex;align-items:center">
+          <span class="issue-name">Ownership gaps in logistics domain</span>
+          <span class="tag tag-med">Medium</span>
+        </div>
+        <div class="issue-desc">11 data entities in the logistics domain have no assigned data producer, creating accountability blind spots.</div>
+      </div>
+    </div>
+
+    <div class="issue">
+      <div class="issue-ic ok"><i class="ti ti-circle-check"></i></div>
+      <div>
+        <div style="display:flex;align-items:center">
+          <span class="issue-name">Customer data contracts</span>
+          <span class="tag tag-low">Resolved</span>
+        </div>
+        <div class="issue-desc">All 6 contracts validated and signed off by owning teams. Continuous monitoring now active.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ARCHITECTURE -->
+  <div id="panel-arch">
+
+    <div class="arch-card">
+      <div class="arch-head">
+        <i class="ti ti-building-store arch-ic"></i>
+        <div class="arch-title">Current state — Centralised MDM</div>
+      </div>
+      <div class="arch-body">TIBCO EBX acts as the central master data hub, handling product, supplier and customer domains. Provides strong consistency but limits team autonomy. Major upgrade from EBX 3.10 → 4.0 is currently in progress across all distribution centers (Raalte frozen foods completed; Nieuwegein NDC-Fresh completed).</div>
+      <div class="pills">
+        <div class="pill">TIBCO EBX 4.0</div>
+        <div class="pill">PostgreSQL</div>
+        <div class="pill">Spring Boot</div>
+        <div class="pill">Azure DevOps</div>
+        <div class="pill">GitHub Actions</div>
+      </div>
+    </div>
+
+    <div class="arch-card">
+      <div class="arch-head">
+        <i class="ti ti-sitemap arch-ic"></i>
+        <div class="arch-title">Target state — Federated data mesh</div>
+      </div>
+      <div class="arch-body">Domain teams own their data products with clear accountability. EBX evolves into a governance and validation layer rather than the sole data owner. Data contracts enforced via schema registry enable teams to evolve independently. This unlocks Agentic AI pipelines that can consume reliable, well-governed data across all domains.</div>
+      <div class="pills">
+        <div class="pill">Data mesh</div>
+        <div class="pill">Data contracts</div>
+        <div class="pill">Kafka</div>
+        <div class="pill">AWS S3</div>
+        <div class="pill">MongoDB</div>
+        <div class="pill">Schema registry</div>
+      </div>
+    </div>
+
+    <div class="arch-card">
+      <div class="arch-head">
+        <i class="ti ti-robot arch-ic"></i>
+        <div class="arch-title">Agentic AI readiness</div>
+      </div>
+      <div class="arch-body">Prerequisite: each data domain must expose a stable, versioned API with clear ownership and contracts. Current gap: 4 of 9 domains are not yet AI-ready. Priority for next quarter: product catalogue and supply chain domains, which power the highest-impact Agentic workflows.</div>
+      <div class="pills">
+        <div class="pill">Agentic AI</div>
+        <div class="pill">MCP layer</div>
+        <div class="pill">API governance</div>
+        <div class="pill">Domain ownership</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div id="footer">
+  Built as a portfolio demo by Eduard — exploring how AI can support data governance at scale.<br>
+  <a href="https://nl.jobs.jumbo.com/en/" target="_blank">Jumbo Tech Campus careers ↗</a>
+</div>
+
+<script>
+  const msgsEl = document.getElementById('msgs');
+  const inpEl  = document.getElementById('inp');
+  const history = [];
+
+  const API_KEY = 'YOUR_API_KEY_HERE'; // Replace with your Anthropic API key
+
+  const SYS = `You are Jumbo's Data Landscape Assistant, an AI tool for the Principal Data Architect role at Jumbo Tech Campus in Veghel, Netherlands.
+
+You help with:
+- Data governance strategy (data contracts, ownership, accountability)
+- Data quality management (deduplication, reliability, consistency)
+- Architectural decisions (EBX MDM, data mesh, microservices, federated models)
+- Preparing the data landscape for Agentic AI
+- Balancing technical and functional objectives
+- Reducing unnecessary data duplication and cost optimisation
+
+Jumbo context:
+- Uses TIBCO EBX as MDM platform (upgrading 3.10 → 4.0)
+- Tech stack: Java/Spring Boot, PostgreSQL, MongoDB, AWS, Azure DevOps, Kafka
+- Distribution centers across Netherlands (Raalte frozen, Nieuwegein fresh, etc.)
+- Moving from centralised MDM toward federated data mesh model
+- 9 data domains: product, supplier, customer, logistics, finance, HR, marketing, operations, analytics
+
+Tone: professional, strategic, concise. Think like a senior architect who balances pragmatism with vision. Answers should be 3-5 sentences max unless a detailed breakdown is requested. Use bullet points only when listing trade-offs or steps.`;
+
+  function scrollB() { msgsEl.scrollTop = msgsEl.scrollHeight; }
+
+  function addMsg(txt, role) {
+    const w = document.createElement('div');
+    w.className = 'msg ' + role;
+    const av = document.createElement('div');
+    av.className = 'av';
+    av.textContent = role === 'user' ? 'You' : 'J';
+    const b = document.createElement('div');
+    b.className = 'bubble';
+    b.textContent = txt;
+    w.appendChild(av); w.appendChild(b);
+    msgsEl.appendChild(w); scrollB();
+  }
+
+  function showTyping() {
+    const w = document.createElement('div');
+    w.className = 'msg bot'; w.id = 'typing';
+    const av = document.createElement('div'); av.className = 'av'; av.textContent = 'J';
+    const b = document.createElement('div'); b.className = 'bubble';
+    b.innerHTML = '<div class="dot-wrap"><div class="d"></div><div class="d"></div><div class="d"></div></div>';
+    w.appendChild(av); w.appendChild(b);
+    msgsEl.appendChild(w); scrollB();
+  }
+
+  function rmTyping() { const t = document.getElementById('typing'); if (t) t.remove(); }
+
+  async function send() {
+    const txt = inpEl.value.trim(); if (!txt) return;
+    inpEl.value = '';
+    addMsg(txt, 'user');
+    history.push({ role: 'user', content: txt });
+    showTyping();
+    try {
+      const r = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': API_KEY,
+          'anthropic-version': '2023-06-01',
+          'anthropic-dangerous-allow-browser': 'true'
+        },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 1000,
+          system: SYS,
+          messages: history
+        })
+      });
+      const d = await r.json();
+      rmTyping();
+      const reply = d.content && d.content[0] ? d.content[0].text : 'Could not generate a response.';
+      addMsg(reply, 'bot');
+      history.push({ role: 'assistant', content: reply });
+    } catch(e) {
+      rmTyping();
+      addMsg('An error occurred. Please try again.', 'bot');
+    }
+  }
+
+  function sc(t) { inpEl.value = t; send(); }
+
+  function switchTab(name, el) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById('panel-chat').style.display    = 'none';
+    document.getElementById('panel-quality').style.display = 'none';
+    document.getElementById('panel-arch').style.display    = 'none';
+    const map = { chat: 'panel-chat', quality: 'panel-quality', arch: 'panel-arch' };
+    const el2 = document.getElementById(map[name]);
+    el2.style.display = 'flex';
+  }
+</script>
+</body>
+</html>
